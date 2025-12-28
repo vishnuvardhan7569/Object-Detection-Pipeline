@@ -1,27 +1,30 @@
-# 🗑️ Trash Object Detection System (YOLOv5 + ONNX + FastAPI)
+# 🗑️ Trash Object Detection System
 
-An **end-to-end object detection pipeline** for identifying trash and plastic waste items using **YOLOv5**, optimized with **ONNX**, benchmarked on **CPU**, and deployed as a **FastAPI inference service**.
+### YOLOv5 · ONNX · FastAPI
 
-This project demonstrates the **complete ML lifecycle**:
-dataset → training → evaluation → optimization → benchmarking → deployment.
+An **end-to-end object detection pipeline** for identifying trash and plastic waste using **YOLOv5**, optimized with **ONNX**, benchmarked on **CPU**, and deployed as a **FastAPI inference service**.
+
+This project demonstrates the **complete machine learning lifecycle**:
+
+**Dataset → Training → Evaluation → Optimization → Benchmarking → Deployment**
 
 ---
 
 ## 🚀 Project Highlights
 
-* ✅ Trained **YOLOv5** on the **TACO Trash Dataset**
-* ✅ Achieved **mAP@50 ≈ 0.34** on 18 waste classes
-* ✅ Exported model to **ONNX** for faster CPU inference
-* ✅ Benchmarked **PyTorch vs ONNX** on CPU
-* ✅ Built **FastAPI REST API** for real-time inference
-* ✅ Auto-rescaled bounding boxes to original image size
-* ✅ Visual output with drawn bounding boxes
+* ✅ Trained **YOLOv5** on the **TACO (Trash Annotations in Context) dataset**
+* ✅ Achieved **mAP@50 ≈ 0.34** across **18 trash classes**
+* ✅ Converted PyTorch model to **ONNX** for optimized CPU inference
+* ✅ Benchmarked **PyTorch vs ONNX** performance on CPU
+* ✅ Deployed model using **FastAPI**
+* ✅ Auto-rescaled bounding boxes to original image resolution
+* ✅ JSON + image-based inference outputs
 
 ---
 
 ## 🧠 Classes Detected (18)
 
-Examples:
+Includes (but not limited to):
 
 * Plastic bag / wrapper
 * Bottle, Bottle cap
@@ -31,59 +34,59 @@ Examples:
 * Cup, Lid
 * Straw
 * Styrofoam piece
-* Other litter, Other plastic
-  …and more.
+* Other litter
+* Other plastic
 
 ---
 
-## 🗂️ Folder Structure
+## 🗂️ Project Structure
 
-```
+```text
 Object Detection/
 │
-├── training/
-│   ├── taco-yolo.ipynb     # Training + evaluation + export
+├── training/                         # Kaggle (GPU)
+│   └── taco-yolo.ipynb               # Dataset prep, training, evaluation, ONNX export
 │
-├── benchmarks/
+├── benchmarks/                       # Local (CPU)
 │   ├── benchmark_pytorch_cpu.py
-│   ├── benchmark_onnx_cpu.py
-│   ├── best.pt
-│   └── best.onnx
-|
-├── yolov5_fastapi/
-│   ├── app.py                   # FastAPI application
-│   ├── best.onnx                # ONNX model for inference
+│   └── benchmark_onnx_cpu.py
+│
+├── yolov5_fastapi/                   # Local deployment
+│   ├── app.py                        # FastAPI application
+│   ├── best.onnx                     # ONNX model (tracked via Git LFS)
 │   └── requirements.txt
 │
 └── README.md
 ```
 
+📌 **Note**
+
+* Training artifacts and datasets remain on **Kaggle**
+* Only **essential inference & benchmarking files** are stored locally
+* Dataset files are intentionally **not included** in the repository
+
 ---
 
 ## 📦 Dataset
 
-* **Dataset**: TACO – Trash Annotations in Context
-* **Format**: YOLO
+* **Name**: TACO – Trash Annotations in Context
 * **Source**: Kaggle
+* **Format**: YOLO
 * **Classes**: 18
-* **Splits**:
+* **Splits**: Train / Validation / Test
 
-  * Train
-  * Validation
-  * Test
-
-Dataset was **used directly from Kaggle Input (read-only)**.
+Dataset was accessed directly from **Kaggle Input (read-only)**.
 
 ---
 
-## 🧪 Work Done in Kaggle Notebook
+## 🧪 Work Done in Kaggle (GPU)
 
-All heavy ML tasks were performed in **Kaggle (GPU)**:
+All computationally intensive steps were performed in a **Kaggle notebook using GPU**.
 
 ### 1️⃣ Dataset Preparation
 
-* Used YOLO-format dataset (`train/`, `valid/`, `test/`)
-* Verified `data.yaml` paths and class names
+* Verified YOLO directory structure
+* Validated `data.yaml` paths and class labels
 
 ### 2️⃣ Training YOLOv5
 
@@ -100,9 +103,9 @@ python train.py \
 
 ### 3️⃣ Model Evaluation
 
-* Precision, Recall, mAP calculated per class
+* Precision, Recall, and mAP computed per class
 * AutoAnchor optimization applied
-* Best weights saved as `best.pt`
+* Best model saved as `best.pt`
 
 ### 4️⃣ Export to ONNX
 
@@ -115,38 +118,40 @@ python export.py \
 Output:
 
 ```
-best.onnx (≈27 MB)
+best.onnx (~27 MB)
 ```
 
 ---
 
-## 📊 Benchmark Results (CPU – VS Code)
+## 📊 CPU Benchmark Results (VS Code)
 
-Benchmarks were done **locally on CPU** using the same image resolution (640×640).
+Benchmarks were performed **locally on CPU**, using the same input resolution (640×640).
 
 | Model   | Avg Inference Time | FPS   |
 | ------- | ------------------ | ----- |
 | PyTorch | 120.88 ms          | 8.27  |
 | ONNX    | 49.53 ms           | 20.19 |
 
-✅ **ONNX is ~2.4× faster than PyTorch on CPU**
+✅ **ONNX provides ~2.4× faster inference on CPU**
 
 ---
 
 ## 🌐 FastAPI Inference Service
 
-### 🔹 Features
+### 🔹 Key Features
 
 * CPU-based ONNX inference
 * Automatic bounding box rescaling
 * JSON response endpoint
-* Image output endpoint with drawn boxes
+* Image response endpoint with bounding boxes drawn
 
-### 🔹 Endpoints
+---
+
+### 🔹 API Endpoints
 
 #### `POST /detect`
 
-Returns detections as JSON.
+Returns detection results in JSON format.
 
 ```json
 {
@@ -163,7 +168,7 @@ Returns detections as JSON.
 
 #### `POST /detect-image`
 
-Returns the image with bounding boxes drawn.
+Returns the image with bounding boxes and labels rendered.
 
 ---
 
@@ -175,7 +180,7 @@ pip install -r requirements.txt
 uvicorn app:app --reload
 ```
 
-Open Swagger UI:
+Swagger UI:
 
 ```
 http://127.0.0.1:8000/docs
@@ -183,37 +188,36 @@ http://127.0.0.1:8000/docs
 
 ---
 
-## 🖼️ Sample Output
+## 🖼️ Output Visualization
 
-* Bounding boxes drawn in **green**
-* Label + confidence shown
-* Boxes correctly mapped to **original image size**
+* Green bounding boxes
+* Class labels with confidence scores
+* Boxes correctly mapped to original image resolution
 
 ---
 
 ## 🧩 Technologies Used
 
-* **Python**
-* **YOLOv5**
-* **PyTorch**
-* **ONNX**
-* **ONNX Runtime**
-* **FastAPI**
-* **OpenCV**
-* **NumPy**
-* **Kaggle GPU**
-* **VS Code (CPU benchmarking)**
+* Python
+* YOLOv5
+* PyTorch
+* ONNX / ONNX Runtime
+* FastAPI
+* OpenCV
+* NumPy
+* Kaggle (GPU)
+* VS Code (CPU inference & benchmarking)
 
 ---
 
 ## 🎯 Key Learning Outcomes
 
-* End-to-end object detection workflow
+* End-to-end object detection pipeline design
+* Dataset handling in real-world scenarios
 * Model optimization using ONNX
 * CPU performance benchmarking
-* Production-style API deployment
-* Handling real-world datasets
-* Clean separation of training and inference environments
+* REST API deployment for ML inference
+* Clean separation of training and deployment environments
 
 ---
 
@@ -223,11 +227,11 @@ http://127.0.0.1:8000/docs
 * GPU inference support
 * Video stream detection
 * Cloud deployment (AWS / Azure / GCP)
-* Frontend dashboard
+* Frontend visualization dashboard
 
 ---
 
 ## 👤 Author
 
 **Vishnu Vardhan Reddy**
-Engineering Student | Full Stack & ML Enthusiast
+Engineering Student | Full Stack & Machine Learning Enthusiast
